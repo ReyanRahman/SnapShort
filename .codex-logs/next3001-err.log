@@ -1,0 +1,8 @@
+⨯ Another next dev server is already running.
+
+- Local:        http://localhost:3000
+- PID:          28372
+- Dir:          C:\Users\Heyas\OneDrive\Desktop\projects\url-shortener
+- Log:          build\dev\logs\next-development.log
+
+Run taskkill /PID 28372 /F to stop it.

@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum TeamRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+  EXPIRED
+}
+
+model User {
+  id           String       @id @default(cuid())
+  name         String
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  links        Link[]
+  ownedTeams   Team[]       @relation("TeamOwner")
+  memberships  TeamMember[]
+}
+
+model Team {
+  id        String       @id @default(cuid())
+  name      String
+  ownerId   String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  owner     User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members   TeamMember[]
+  invites   Invite[]
+  links     Link[]
+}
+
+model TeamMember {
+  id        String   @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamRole @default(EDITOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+}
+
+model Link {
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  originalUrl     String
+  title           String?
+  createdByUserId String?
+  teamId          String?
+  isActive        Boolean      @default(true)
+  expiresAt       DateTime?
+  isArchived      Boolean      @default(false)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  creator         User?        @relation(fields: [createdByUserId], references: [id], onDelete: SetNull)
+  team            Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  visits          VisitEvent[]
+
+  @@index([createdByUserId])
+  @@index([teamId])
+  @@index([slug, isArchived])
+}
+
+model VisitEvent {
+  id         String   @id @default(cuid())
+  linkId      String
+  visitedAt   DateTime @default(now())
+  ipHash      String?
+  country     String?
+  city        String?
+  deviceType  String?
+  browser     String?
+  os          String?
+  referrer    String?
+  userAgent   String?
+  link        Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+
+  @@index([linkId, visitedAt])
+}
+
+model Invite {
+  id         String       @id @default(cuid())
+  teamId      String
+  email       String
+  role        TeamRole
+  token       String       @unique
+  status      InviteStatus @default(PENDING)
+  expiresAt   DateTime
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  acceptedAt  DateTime?
+  invitedUserId String?
+  team        Team         @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@index([teamId, email, status])
+}

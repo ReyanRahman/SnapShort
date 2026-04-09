@@ -1,0 +1,50 @@
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[browser] A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <RedirectErrorBoundary router={{...}}>
+      <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:{...}, ...}} segmentPath={[...]} ...>
+        <SegmentViewNode type="page" pagePath="page.tsx">
+          <SegmentTrieNode>
+          <Home>
+            <main className="pb-20">
+              <section className="mx-auto w-...">
+                <LinkShortenerForm teams={[...]}>
+                  <Card className="overflow-h...">
+                    <div className="rounded-[2...">
+                      <div className="grid gap-6...">
+                        <div>
+                          <div>
+                          <h1>
+                          <p>
+                          <form className="mt-8 space..." onSubmit={function handleSubmit}>
+                            <_c>
+                            <div>
+                            <div className="grid gap-4...">
+                              <Select>
+                              <_c min="2026-04-09..." type="datetime-l..." value="" onChange={function onChange}>
+                                <input
+                                  ref={null}
+                                  className="flex h-11 w-full rounded-2xl border border-black/10 bg-white px-4 text-sm..."
++                                 min="2026-04-09T05:42"
+-                                 min="2026-04-09T05:14"
+                                  type="datetime-local"
+                                  value=""
+                                  onChange={function onChange}
+                                >
+                            ...
+                        ...
+              ...
+        ...
+      ...
+ 
