@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 const protectedPrefixes = ["/dashboard"];
 const authPages = ["/login", "/signup"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
